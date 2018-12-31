@@ -63,6 +63,7 @@ class Structured_perceptron:
         return np.concatenate((np.zeros(y * IMG_SIZE), end))
     
     def predict(self, weights, example):
+#        '''The code in comments is equivalent to the np code used'''
 #        maximum = float('-inf')
 #        argmax = None
 #        for i in range(self.num_classes):
@@ -85,10 +86,11 @@ class Structured_perceptron:
 def perceptron(x, y, method):
     weights = method.initialize_weights()
     total = len(x)
+    final_weights = []
     for epoch in range(1, EPOCHS + 1):
         print(f'Epoch #{epoch}')
-        x, y = shuffle(x, y, random_state=epoch)
         weights_adj = []
+        x, y = shuffle(x, y, random_state=epoch)
         for index, (example, tag) in enumerate(zip(x, y)):
             if index % 10000 == 0:
                 print(f'-- {round(float(index) / total * 100, 2)}%')
@@ -96,7 +98,8 @@ def perceptron(x, y, method):
             if prediction != classes[tag]:
                 weights = method.update(weights, example, prediction, classes[tag])
                 weights_adj.append(weights)
-        weights = np.average(weights_adj, 0)
+        final_weights.append(np.average(weights_adj, 0))
+    weights = np.average(final_weights, 0)
     return weights
 
 def test(x, y, weights, method):
@@ -124,6 +127,6 @@ if __name__ == '__main__':
     train_x, train_y = (data_x[:cutoff], data_y[:cutoff])
     pred_x, pred_y = (data_x[cutoff:], data_y[cutoff:])
     
-    method = Multiclass_perceptron(len(classes))
+    method = Structured_perceptron(len(classes))
     model = perceptron(train_x, train_y, method)
     test(pred_x, pred_y, model, method)
