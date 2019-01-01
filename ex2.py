@@ -20,7 +20,7 @@ FOLD = 3
 PIXELS = 4
 
 IMG_SIZE = 128
-EPOCHS = 3
+EPOCHS = 5
 ONE_HOT = ''
 CLASSES = ''
 
@@ -201,5 +201,5 @@ if __name__ == '__main__':
         raise Exception("Illegal command line arguments")
 
     model = perceptron(train_x, train_y, method)
-    pickle.dump(model, open('model_' + method_type, 'rb'))
+    pickle.dump(model, open('model_' + method_type, 'wb'))
     test(pred_x, pred_y, model, method)
