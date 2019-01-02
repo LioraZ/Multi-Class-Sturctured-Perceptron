@@ -99,13 +99,13 @@ def perceptron(x, y, method):
         for index, (example, tag) in enumerate(zip(x, y)):
             if index % 1000 == 0:
                 print(f'-- {round(float(index) / total * 100, 2)}%')
-                test(pred_x[:50], np.average(weights_adj, 0), method)
+                test(pred_x[:50], pred_y[:50], np.average(weights_adj, 0), method)
             prediction = method.predict(weights, example)
             if prediction != classes[tag]:
                 weights = method.update(weights, example, prediction, classes[tag])
                 weights_adj.append(weights)
         final_weights.append(np.average(weights_adj, 0))
-        test(pred_x, np.average(final_weights, 0), method)
+        test(pred_x, pred_y, np.average(final_weights, 0), method)
     weights = np.average(final_weights, 0)
     return weights
 
@@ -136,6 +136,7 @@ def test_predict(test_set, weights, method, inv_tags):
 
 if __name__ == '__main__':
     method_type = sys.argv[1]
+    ONE_HOT = np.eye(NUM_CLASSES)
 
     if method_type == 'a':
         method = Multiclass_perceptron(NUM_CLASSES)
@@ -150,7 +151,6 @@ if __name__ == '__main__':
         data_x, data_y = load_data(TRAIN)
         cutoff = round(len(data_x) * 0.8)
         classes = {v: i for i, v in enumerate(set(data_y))}
-        ONE_HOT = np.eye(len(classes))
         train_x, train_y = (data_x[:cutoff], data_y[:cutoff])
         pred_x, pred_y = (data_x[cutoff:], data_y[cutoff:])
         model = perceptron(train_x, train_y, method)
