@@ -7,6 +7,8 @@ import numpy as np
 from sklearn.utils import shuffle
 import sys
 import pickle
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import normalize
 from collections import defaultdict
 
 DATA_DIR = 'data'
@@ -157,11 +159,29 @@ def test_predict(test_set, weights, method, inv_tags):
     with open('test_' + method_type + '.pred', 'w') as file:
         file.write('\n'.join(all_predictions))
 
+def draw_heatmap(test_set, weights, method, inv_tags):
+    labels = [inv_tags[i] for i in range(len(inv_tags))]
+    data = np.reshape(weights[IMG_SIZE * len(labels):], (27, 27))
+    #normed_matrix = normalize(data, axis=1, norm='l1')
+    fig, ax = plt.subplots()
+    ax.imshow(data, cmap='Greys')
+    
+    ax.set_xticks(np.arange(len(labels)))
+    ax.set_yticks(np.arange(len(labels)))
+    ax.set_xticklabels(labels)
+    ax.set_yticklabels(labels)
+    ax.set_title("Correlation Heatmap Between Letters")
+    fig.tight_layout()
+    plt.show()
+
+
+
+
 
 if __name__ == '__main__':
     method_type = 'c'
     method = Bigram_structured_perceptron(NUM_CLASSES)
-
+    
     if 'train' in sys.argv:
         data, tags = load_data(TRAIN)
         np.random.shuffle(data)
@@ -171,13 +191,15 @@ if __name__ == '__main__':
         pred_x = data[cutoff:]
         model = perceptron(train_x, method)
         pickle.dump([model, classes], open('model_' + method_type, 'wb'))
-
-    if 'test' in sys.argv:
+    elif 'test' in sys.argv:
         test_data, _ = load_data(TEST)
         model, classes = pickle.load(open('model_' + method_type, 'rb'))
         test_predict(test_data, model, method, {v: k for k, v in classes.items()})
-
-    if 'train' not in sys.argv and 'test' not in sys.argv:
+    elif 'draw' in sys.argv:
+        test_data, _ = load_data(TEST)
+        model, classes = pickle.load(open('model_' + method_type, 'rb'))
+        draw_heatmap(test_data, model, method, {v: k for k, v in classes.items()})
+    else:
         raise Exception("Illegal command line parameters received!")
 
 
