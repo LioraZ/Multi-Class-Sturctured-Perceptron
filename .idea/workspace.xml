@@ -53,15 +53,16 @@
       <file leaf-file-name="ex2.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ex2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-295">
-              <caret line="128" column="51" lean-forward="false" selection-start-line="128" selection-start-column="51" selection-end-line="128" selection-end-column="51" />
+            <state relative-caret-position="176">
+              <caret line="11" column="29" lean-forward="true" selection-start-line="11" selection-start-column="29" selection-end-line="11" selection-end-column="29" />
               <folding>
                 <element signature="e#24#68#1" expanded="false" />
                 <element signature="e#69#87#0" expanded="true" />
-                <element signature="e#753#783#0" expanded="false" />
-                <element signature="e#835#884#0" expanded="false" />
-                <element signature="e#1429#1564#0" expanded="false" />
-                <element signature="e#3200#3583#0" expanded="false" />
+                <element signature="e#754#784#0" expanded="false" />
+                <element signature="e#836#885#0" expanded="false" />
+                <element signature="e#1430#1565#0" expanded="false" />
+                <element signature="e#1620#1944#1" expanded="false" />
+                <element signature="e#3201#3584#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -177,10 +178,10 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../NLP/Ass1/Ass1/hmm2/HMMTag.py" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/ex2.py" />
   </component>
-  <component name="RunManager" selected="Python.ex2">
-    <configuration default="false" name="ex2" type="PythonConfigurationType" factoryName="Python" temporary="true">
+  <component name="RunManager" selected="Python.ex2 a">
+    <configuration default="false" name="ex2 b" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -193,7 +194,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="Ex2" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ex2.py" />
-      <option name="PARAMETERS" value="b train test" />
+      <option name="PARAMETERS" value="b train" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
     </configuration>
@@ -382,15 +383,33 @@
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
     </configuration>
-    <list size="4">
+    <configuration default="false" name="ex2 a" type="PythonConfigurationType" factoryName="Python">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\Liora\Anaconda3\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="Ex2" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ex2.py" />
+      <option name="PARAMETERS" value="a train" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <method />
+    </configuration>
+    <list size="5">
       <item index="0" class="java.lang.String" itemvalue="Python.mc svm" />
-      <item index="1" class="java.lang.String" itemvalue="Python.ex2" />
-      <item index="2" class="java.lang.String" itemvalue="Python.structured_perceptron" />
-      <item index="3" class="java.lang.String" itemvalue="Python.perceptron" />
+      <item index="1" class="java.lang.String" itemvalue="Python.ex2 a" />
+      <item index="2" class="java.lang.String" itemvalue="Python.ex2 b" />
+      <item index="3" class="java.lang.String" itemvalue="Python.structured_perceptron" />
+      <item index="4" class="java.lang.String" itemvalue="Python.perceptron" />
     </list>
     <recent_temporary>
       <list size="3">
-        <item index="0" class="java.lang.String" itemvalue="Python.ex2" />
+        <item index="0" class="java.lang.String" itemvalue="Python.ex2 b" />
         <item index="1" class="java.lang.String" itemvalue="Python.structured_perceptron" />
         <item index="2" class="java.lang.String" itemvalue="Python.perceptron" />
       </list>
@@ -413,12 +432,12 @@
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="false" />
     <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13856691" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13856691" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3411371" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3411371" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32998884" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -437,13 +456,6 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/ex2.py</url>
-          <line>79</line>
-          <option name="timeStamp" value="60" />
-        </line-breakpoint>
-      </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
           <properties notifyOnTerminate="true" exception="BaseException">
@@ -605,15 +617,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/ex2.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-295">
-          <caret line="128" column="51" lean-forward="false" selection-start-line="128" selection-start-column="51" selection-end-line="128" selection-end-column="51" />
+        <state relative-caret-position="176">
+          <caret line="11" column="29" lean-forward="true" selection-start-line="11" selection-start-column="29" selection-end-line="11" selection-end-column="29" />
           <folding>
             <element signature="e#24#68#1" expanded="false" />
             <element signature="e#69#87#0" expanded="true" />
-            <element signature="e#753#783#0" expanded="false" />
-            <element signature="e#835#884#0" expanded="false" />
-            <element signature="e#1429#1564#0" expanded="false" />
-            <element signature="e#3200#3583#0" expanded="false" />
+            <element signature="e#754#784#0" expanded="false" />
+            <element signature="e#836#885#0" expanded="false" />
+            <element signature="e#1430#1565#0" expanded="false" />
+            <element signature="e#1620#1944#1" expanded="false" />
+            <element signature="e#3201#3584#0" expanded="false" />
           </folding>
         </state>
       </provider>
