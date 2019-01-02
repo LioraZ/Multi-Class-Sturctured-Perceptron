@@ -20,6 +20,7 @@ FOLD = 3
 PIXELS = 4
 
 IMG_SIZE = 128
+NUM_CLASSES = 26
 EPOCHS = 5
 ONE_HOT = ''
 CLASSES = ''
@@ -85,61 +86,6 @@ class Structured_perceptron:
             weights[y_actual] += self.phi(example, y_actual)
             weights[y_hat] -= self.phi(example, y_hat)
         return weights
-        
-
-class Bigram_structured_perceptron:
-    def __init__(self, num_classes):
-        self.num_classes = num_classes
-
-    def initialize_weights(self):
-        return np.zeros([self.num_classes, IMG_SIZE * self.num_classes + (self.num_classes ** 2)])
-
-    def phi(self, x, y, prev_y):
-        word_phi = np.zeros(IMG_SIZE * self.num_classes)
-        word_phi[y: y + IMG_SIZE] = x
-        bigram_phi = np.zeros([self.num_classes, self.num_classes])
-        bigram_phi[prev_y][y] = 1
-        bigram_phi.flatten()
-        return np.concatenate((word_phi, bigram_phi))
-
-    def predict(self, W, x):
-        label_size = len(classes) # ???
-        D_S = np.zeros([label_size, len(classes)]) # scores
-        D_PI = np.zeros([label_size, len(classes)]) # back-pointers
-
-        # Initialization
-        for i, tag in enumerate(classes.keys()):
-            phi = self.phi(x, tag, prev_y=START)
-            s = W * phi
-            D_S[0][i] = s
-            D_PI[0][i] = 0
-
-        # Recursion
-        for i in range(1, label_size):
-            for j, tag in enumerate(classes.keys()):
-                curr_char = tag # ???
-                # d_best = i_best = -1
-                d_best, i_best = max(W * phi(x,y * curr_char) + D_S[i - 1][y] for y in classes.values())
-                D_S[i][j] = d_best
-                D_PI[i][j] = i_best
-
-        # Back-track
-        y_hat = np.zeros(label_size)
-        d_best = -1
-        for i, tag in enumerate(classes.keys()):
-            if d_best < D_S[label_size - 1][i]:
-                y_hat[label_size - 1] = i
-                d_best = D_S[label_size - 1][i]
-
-        for i in range(label_size)[label_size - 2: -1:]:
-            y_hat[i] = D_PI[i + 1][y_hat[i + 1]]
-        return y_hat
-
-    def update(self, weights, example, y_hat, y_actual):
-        if y_hat != y_actual:
-            weights[y_actual] += self.phi(example, y_actual)
-            weights[y_hat] -= self.phi(example, y_hat)
-        return weights
 
 
 def perceptron(x, y, method):
@@ -151,13 +97,15 @@ def perceptron(x, y, method):
         weights_adj = []
         x, y = shuffle(x, y, random_state=epoch)
         for index, (example, tag) in enumerate(zip(x, y)):
-            if index % 10000 == 0:
+            if index % 1000 == 0:
                 print(f'-- {round(float(index) / total * 100, 2)}%')
+                test(pred_x[:50], np.average(weights_adj, 0), method)
             prediction = method.predict(weights, example)
             if prediction != classes[tag]:
                 weights = method.update(weights, example, prediction, classes[tag])
                 weights_adj.append(weights)
         final_weights.append(np.average(weights_adj, 0))
+        test(pred_x, np.average(final_weights, 0), method)
     weights = np.average(final_weights, 0)
     return weights
 
@@ -177,29 +125,41 @@ def test(x, y, weights, method):
     return success_rate
 
 
+def test_predict(test_set, weights, method, inv_tags):
+    all_predictions = []
+    for word in test_set:
+        predictions = method.predict(weights, word[0])
+        all_predictions.extend([inv_tags[prediction] for prediction in predictions])
+    with open('test_' + method_type + '.pred', 'w') as file:
+        file.write('\n'.join(all_predictions))
+
+
 if __name__ == '__main__':
-    #method_type = sys.argv[1]
-    method_type = 'b'
-    data_x, data_y = load_data(TRAIN)
-    cutoff = round(len(data_x) * 0.8)
-    classes = {v: i for i, v in enumerate(set(data_y))}
-    ONE_HOT = np.eye(len(classes))
-    train_x, train_y = (data_x[:cutoff], data_y[:cutoff])
-    pred_x, pred_y = (data_x[cutoff:], data_y[cutoff:])
+    method_type = sys.argv[1]
 
     if method_type == 'a':
-        method = Multiclass_perceptron(len(classes))
+        method = Multiclass_perceptron(NUM_CLASSES)
 
     elif method_type == 'b':
-        method = Structured_perceptron(len(classes))
-
-    elif method_type == 'c':
-        classes[START] = len(classes)
-        method = Bigram_structured_perceptron(len(classes))
+        method = Structured_perceptron(NUM_CLASSES)
 
     else:
         raise Exception("Illegal command line arguments")
 
-    model = perceptron(train_x, train_y, method)
-    pickle.dump(model, open('model_' + method_type, 'wb'))
-    test(pred_x, pred_y, model, method)
+    if 'train' in sys.argv:
+        data_x, data_y = load_data(TRAIN)
+        cutoff = round(len(data_x) * 0.8)
+        classes = {v: i for i, v in enumerate(set(data_y))}
+        ONE_HOT = np.eye(len(classes))
+        train_x, train_y = (data_x[:cutoff], data_y[:cutoff])
+        pred_x, pred_y = (data_x[cutoff:], data_y[cutoff:])
+        model = perceptron(train_x, train_y, method)
+        pickle.dump([model, classes], open('model_' + method_type, 'wb'))
+
+    if 'test' in sys.argv:
+        test_data, _ = load_data(TEST)
+        model, classes = pickle.load(open('model_' + method_type, 'rb'))
+        test_predict(test_data, model, method, {v: k for k, v in classes.items()})
+
+    if 'train' not in sys.argv and 'test' not in sys.argv:
+        raise Exception("Illegal command line parameters received!")

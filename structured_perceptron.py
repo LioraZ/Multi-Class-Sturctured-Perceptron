@@ -22,8 +22,7 @@ PIXELS = 4
 
 IMG_SIZE = 128
 EPOCHS = 3
-ONE_HOT = ''
-CLASSES = ''
+NUM_CLASSES = 27
 
 
 def load_data(data_path):
@@ -53,107 +52,60 @@ class Bigram_structured_perceptron:
         return np.zeros(IMG_SIZE * self.num_classes + (self.num_classes ** 2))
 
     def phi(self, x, y, prev_y):
-        # y, prev_y = classes[y], classes[prev_y]
-        word_phi = np.zeros((IMG_SIZE * self.num_classes))
-        word_phi[y * IMG_SIZE: (y + 1) * IMG_SIZE] = x
+        word_phi = np.zeros(IMG_SIZE * self.num_classes)
         bigram_phi = np.zeros([self.num_classes, self.num_classes])
+        word_phi[y * IMG_SIZE: (y + 1) * IMG_SIZE] = x
         bigram_phi[prev_y][y] = 1
         bigram_phi = np.ravel(bigram_phi)
         return np.concatenate((word_phi, bigram_phi))
 
     def predict(self, W, words):
         label_size = len(words)
-        # D_S = np.zeros([label_size, len(classes)]) # scores
-        # D_PI = np.zeros([label_size, len(classes)]) # back-pointers
-        D_S = defaultdict(float)
-        D_PI = defaultdict(int)
+        D_S = defaultdict(float) # scores
+        D_PI = defaultdict(int) # back-pointers
 
         # Initialization
         for i, tag in enumerate(classes.keys()):
             phi = self.phi(words[0], classes[tag], prev_y=classes[START])
             s = np.dot(W, phi)
-            D_S[(0, i)] = s
-            D_PI[(0, i)] = 0
+            D_S[(0, classes[tag])] = s
+            D_PI[(0, classes[tag])] = 0
 
         # Recursion
         for i in range(1, label_size):
             for j, tag in enumerate(classes.keys()):
-                temp_vals = [np.dot(W, self.phi(words[i], classes[tag], classes[prev_y])) + D_S[(i - 1, prev_y)] for
+                temp_vals = [np.dot(W, self.phi(words[i], classes[tag], classes[prev_y])) + D_S[(i - 1, classes[prev_y])] for
                              prev_y in classes.keys()]
-                D_PI[(i, j)] = np.argmax(temp_vals)
-                D_S[(i, j)] = temp_vals[D_PI[(i, j)]]
+                D_PI[(i, classes[tag])] = np.argmax(temp_vals)
+                D_S[(i, classes[tag])] = temp_vals[D_PI[(i, classes[tag])]]
 
         # Back-track
         y_hat = np.zeros(label_size, dtype=int)
         d_best = -1
         for i, tag in enumerate(classes.keys()):
-            if d_best < D_S[(label_size - 1, i)]:
-                y_hat[label_size - 1] = i
-                d_best = D_S[(label_size - 1, i)]
+            if d_best < D_S[(label_size - 1, classes[tag])]:
+                y_hat[label_size - 1] = classes[tag]
+                d_best = D_S[(label_size - 1, classes[tag])]
 
         for i in range(label_size - 2, -1, -1):
             y_hat[i] = D_PI[(i + 1, y_hat[i + 1])]
         return y_hat
 
-    """def update(self, weights, example, y_hat, y_actual, y_prev):
-        if y_hat != y_actual:
-            weights += self.phi(example, y_actual, y_prev)
-            weights -= self.phi(example, y_hat, y_prev)
-        return weights"""
     def update(self, weights, letters, tag_vec, predictions):
         prev_tag = prev_pred = classes[START]
-        real_phi = np.zeros(IMG_SIZE * self.num_classes + (self.num_classes ** 2))
-        pred_phi = np.zeros(IMG_SIZE * self.num_classes + (self.num_classes ** 2))
+        bigram_phi = np.zeros((self.num_classes, self.num_classes))
+        pixels_phi = np.zeros(self.num_classes * IMG_SIZE)
         for i, (tag, prediction) in enumerate(zip(tag_vec, predictions)):
-            real_phi += self.phi(letters[i], tag, prev_tag)
-            pred_phi += self.phi(letters[i], prediction, prev_pred)
+            pixels_phi[tag * IMG_SIZE: (tag + 1) * IMG_SIZE] += letters[i]
+            pixels_phi[prediction * IMG_SIZE: (prediction + 1) * IMG_SIZE] -= letters[i]
+            bigram_phi[prev_tag][tag] += 1
+            bigram_phi[prev_pred][prediction] -= 1
             prev_tag = tag
             prev_pred = prediction
-        weights += real_phi - pred_phi
+        weights[:self.num_classes * IMG_SIZE] += pixels_phi
+        weights[self.num_classes * IMG_SIZE:] += np.ravel(bigram_phi)
         return weights
 
-    def new_pred(self, W, word):
-        label_size = len(word)
-        num_of_eng_char = 27
-        D_S = np.zeros((label_size, num_of_eng_char))  # use for scores
-        D_PI = np.zeros((label_size, num_of_eng_char))  # use to save the prev char index
-        # ================= INITIALIZATION ================= //
-        prev_char = '$'  # get scores for the first letter where the perv is $
-        for i in range(1, num_of_eng_char):
-            curr_char = chr(i + 96)
-            phi = self.phi(word[0], classes[curr_char], classes[prev_char])
-            s = np.dot(W, phi)
-            D_S[0][i] = s
-            D_PI[0][i] = 0
-        # ===================== RECURSION ===================== //
-        d_best = -1
-        for i in range(1, label_size):
-            for y in range(1, num_of_eng_char):
-                maxy = -float("inf")
-                the_max_prev_y = -1
-                for prev_y in range(1, num_of_eng_char):
-                    phi = self.phi(word[i], classes[chr(y + 96)], classes[chr(prev_y + 96)])
-                    val = np.dot(W, phi) + D_S[i - 1][classes[chr(prev_y + 96)]]
-                    if (val > maxy):
-                        maxy = val
-                        the_max_prev_y = classes[chr(prev_y + 96)]
-
-                D_S[i][y] = maxy
-                D_PI[i][y] = the_max_prev_y
-
-        # ============================================================ //
-        # ======================== BACK-TRACK ======================== //
-        y_hat = np.zeros(label_size, dtype=int)
-        d_best = -float("inf")
-        for i in range(1, num_of_eng_char):
-            if d_best < D_S[label_size - 1][i]:
-                y_hat[label_size - 1] = i
-                d_best = D_S[label_size - 1][i]
-
-        for i in range(label_size - 2, -1, -1):
-            y_hat[i] = D_PI[i + 1][y_hat[i + 1]]
-        # ============================================================ //
-        return y_hat
 
 def perceptron(x, method):
     weights = method.initialize_weights()
@@ -168,25 +120,12 @@ def perceptron(x, method):
             if index % 500 == 1:
                 print(f'-- {round(float(index) / total * 100, 2)}%')
                 test(pred_x[:50], np.average(weights_adj, 0), method)
-            # prev_tag = classes[START]
             predictions = method.predict(weights, letters)
-            # predictions = method.new_pred(weights, letters)
             tag_vec = [classes[tag] for tag in letter_tags]
             weights = method.update(weights, letters, tag_vec, predictions)
             weights_adj.append(weights)
-            """for i, (tag, prediction) in enumerate(zip(tag_vec, predictions)):
-                if prediction != tag:
-                    weights = method.update(weights, letters[i], prediction, tag, prev_tag)
-                    weights_adj.append(weights)
-                prev_tag = tag"""
-            """for i, (letter, tag) in enumerate(zip(letters, letter_tags)):
-                prediction = method.predict(weights, letter, len(letters))
-                if prediction[i] != classes[tag]:
-                    weights = method.update(weights, letters, prediction[i], classes[tag], classes[prev_tag])
-                    weights_adj.append(weights)
-                prev_tag = tag"""
         final_weights.append(np.average(weights_adj, 0))
-        # test(pred_x, np.average(final_weights, 0), method)
+        test(pred_x, np.average(final_weights, 0), method)
     weights = np.average(final_weights, 0)
     return weights
 
@@ -197,7 +136,6 @@ def test(x, weights, method):
     for word in x:
         letters, letter_tags = word
         predictions = method.predict(weights, letters)
-        # predictions = method.new_pred(weights, letters)
         tag_vec = [classes[tag] for tag in letter_tags]
         for tag, prediction in zip(tag_vec, predictions):
             if prediction == tag:
@@ -211,23 +149,36 @@ def test(x, weights, method):
     return success_rate
 
 
+def test_predict(test_set, weights, method, inv_tags):
+    all_predictions = []
+    for word in test_set:
+        predictions = method.predict(weights, word[0])
+        all_predictions.extend([inv_tags[prediction] for prediction in predictions])
+    with open('test_' + method_type + '.pred', 'w') as file:
+        file.write('\n'.join(all_predictions))
+
+
 if __name__ == '__main__':
-    #method_type = sys.argv[1]
     method_type = 'c'
-    data, tags = load_data(TRAIN)
-    cutoff = round(len(data) * 0.8)
-    classes = {v: i for i, v in enumerate(set(tags).union(START))}
-    ONE_HOT = np.eye(len(classes))
-    train_x = data[:cutoff]
-    pred_x = data[cutoff:]
+    method = Bigram_structured_perceptron(NUM_CLASSES)
 
-    if method_type == 'c':
-        # classes[START] = len(classes)
-        method = Bigram_structured_perceptron(len(classes))
+    if 'train' in sys.argv:
+        data, tags = load_data(TRAIN)
+        np.random.shuffle(data)
+        cutoff = round(len(data) * 0.8)
+        classes = {v: i for i, v in enumerate(set(tags).union(START))}
+        train_x = data[:cutoff]
+        pred_x = data[cutoff:]
+        model = perceptron(train_x, method)
+        pickle.dump([model, classes], open('model_' + method_type, 'wb'))
 
-    else:
-        raise Exception("Illegal command line arguments")
+    if 'test' in sys.argv:
+        test_data, _ = load_data(TEST)
+        model, classes = pickle.load(open('model_' + method_type, 'rb'))
+        test_predict(test_data, model, method, {v: k for k, v in classes.items()})
 
-    model = perceptron(train_x, method)
-    pickle.dump(model, open('model_' + method_type, 'wb'))
-    test(pred_x, model, method)
+    if 'train' not in sys.argv and 'test' not in sys.argv:
+        raise Exception("Illegal command line parameters received!")
+
+
+
