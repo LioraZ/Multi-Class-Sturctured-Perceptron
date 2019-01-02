@@ -45,16 +45,14 @@ class Multiclass_perceptron:
     def initialize_weights(self):
         return np.random.rand(self.num_classes, IMG_SIZE)
 
-    @staticmethod
-    def update(weights, example, y_hat, y_actual):
+    def update(self, weights, example, y_hat, y_actual):
         if y_hat != y_actual:
             weights[y_actual] += example
             weights[y_hat] -= example
         return weights
 
-    @staticmethod
-    def predict(weights, example):
-        return np.argmax(weights.dot(example))
+    def predict(self, weights, example):
+        return np.argmax(np.dot(weights, example))
 
 
 class Structured_perceptron:
@@ -97,9 +95,8 @@ def perceptron(x, y, method):
         weights_adj = []
         x, y = shuffle(x, y, random_state=epoch)
         for index, (example, tag) in enumerate(zip(x, y)):
-            if index % 1000 == 0:
+            if index % 10000 == 0:
                 print(f'-- {round(float(index) / total * 100, 2)}%')
-                test(pred_x[:50], pred_y[:50], np.average(weights_adj, 0), method)
             prediction = method.predict(weights, example)
             if prediction != classes[tag]:
                 weights = method.update(weights, example, prediction, classes[tag])
@@ -127,9 +124,9 @@ def test(x, y, weights, method):
 
 def test_predict(test_set, weights, method, inv_tags):
     all_predictions = []
-    for word in test_set:
-        predictions = method.predict(weights, word[0])
-        all_predictions.extend([inv_tags[prediction] for prediction in predictions])
+    for letter in test_set:
+        prediction = method.predict(weights, letter)
+        all_predictions.append(inv_tags[prediction])
     with open('test_' + method_type + '.pred', 'w') as file:
         file.write('\n'.join(all_predictions))
 
